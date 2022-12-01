@@ -20,6 +20,8 @@ class ConvNet(nn.Module):
     def __init__(self, in_channels=3, out_channels=2, batch_size=1):
         super().__init__()
         
+        self.flag = True
+        
         self.in_channels = in_channels
         self.out_channels = out_channels
         
@@ -119,39 +121,51 @@ class ConvNet(nn.Module):
     def forward(self, x):
         
         for i in range(len(self.conv)):
-            
-            self.org_shapes.append(x.shape)
+           
+            if self.flag:
+                self.org_shapes.append(x.shape)
             
             x = self.conv[i](x)
             x = F.relu(x)
             
             if isinstance(self.pool[i], nn.MaxPool2d):
-                self.unpool_shapes.append(x.shape)
+                if self.flag:
+                    self.unpool_shapes.append(x.shape)
+                    
                 x, indices = self.pool[i](x)
-                self.switches.append(indices)
+                
+                if self.flag:
+                    self.switches.append(indices)
                 
             else:
-                self.unpool_shapes.append(None)
+                if self.flag:
+                    self.unpool_shapes.append(None)
+                    
                 x = self.pool[i](x)
-                self.switches.append(None)
+                
+                if self.flag:
+                    self.switches.append(None)
                 
             ## Local Contrast Normalization across feature maps (similar to AlexNet)
             x = self.norm[i](x)
             
-            self.feature_maps.append(x)
+            if self.flag:
+                self.feature_maps.append(x)
+                
             
         ## Flatten tensor for Linear Layers
-        
         x = torch.flatten(x, 1)
         
-        
         for i in range(len(self.linear) - 1):
+            
             x = self.linear[i](x)
             x = self.drop[i](x)
             x = F.relu(x)
             
         x = self.linear[-1](x)
         x = F.softmax(x, dim=1)
+        
+        self.flag = False
         
         return x
     
