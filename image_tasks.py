@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
 
 def resize_image(img, size):
     h, w = img.shape[:2]
@@ -26,9 +27,18 @@ def resize_image(img, size):
     return img_reshaped
 
 def scale_image(img, scale_ratio):
-    """scale_ratio must be >= 1"""
+    """
+    scale_ratio: must be >= 1
+    
+    Scale and then crop the center of the image to the original size
+    """
+    
     h, w = img.shape[:2]
-    return cv2.resize(img, (int(w * scale_ratio), int(h * scale_ratio)))
+    img_scaled = cv2.resize(img, (int(w * scale_ratio), int(h * scale_ratio)))
+
+    return img_scaled[int((h * scale_ratio - h) / 2):int((h * scale_ratio + h) / 2), 
+                          int((w * scale_ratio - w) / 2):int((w * scale_ratio + w) / 2), :]
+    
 
 def vert_trans_image(img, y):
     rows, cols = img.shape[:2]
@@ -53,10 +63,22 @@ def occlude_image(img, x, y, size=40):
     img_occluded[y:y+size, x:x+size, :] = 128
     return img_occluded
 
-def print_image(img, name="Image"):
+def cv2_print_image(img, name="Image"):
     cv2.imshow(name, img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+def plt_print_image(img, name="Image"):
+    plt.axis("off")
+    plt.imshow(img)
+    plt.title(name)
+    plt.show()
+
+def print_image(img, name="Image", option=0):
+    if option == 0:
+        cv2_print_image(img, name)
+    else:
+        plt_print_image(img, name)
 
 # def crop_image(img, size=224):
 #     """Crop a portion of size `size` from img"""
@@ -66,15 +88,25 @@ def print_image(img, name="Image"):
 #     return img[y:y+size, x:x+size, :], x, y
 
 
-def test():
+def img_manipulation_tests(option=0):
     img = cv2.imread('images/n01440764_tench.jpeg')
     img = resize_image(img, 256)
 
-    print_image(img, "Original")
-    print_image(scale_image(img, 1.5), "Scaled")
-    print_image(vert_trans_image(img, -50), "Vertically Translated by -50")
-    print_image(rotate_image(img, 200), "Rotated by 200 degrees")
-    print_image(occlude_image(img, 200, 120, 50), "Occlusion")
+    img_scaled = scale_image(img, 1.5)
+    img_translated = vert_trans_image(img, -50)
+    img_rotated = rotate_image(img, 200)
+    img_occluded = occlude_image(img, 200, 120, 50)
+
+    # print(img.shape == img_scaled.shape)
+    # print(img.shape == img_translated.shape)
+    # print(img.shape == img_rotated.shape)
+    # print(img.shape == img_occluded.shape)
+
+    print_image(img, "Original", option)
+    print_image(img_scaled, "Scaled", option)
+    print_image(img_translated, "Vertically Translated", option)
+    print_image(img_rotated, "Rotated", option)
+    print_image(img_occluded, "Occluded", option)
 
 if __name__ == "__main__":
-    test()
+    img_manipulation_tests()
