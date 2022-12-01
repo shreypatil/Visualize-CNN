@@ -113,7 +113,7 @@ def main() :
 
 
     # Training Loop
-    epochs = 70
+    epochs = 71
     print("-----Training Loop Started-----")
     for epoch in range(epochs):  
 
@@ -141,10 +141,9 @@ def main() :
             if i % 200 == 199:    
                 print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 200:.3f}')
                 running_loss = 0.0
-	
-	if ((epoch % 10) == 0) :   
-		torch.save(net.state_dict(), f'~/Courses/SMAI_Project/Weights/Model{epoch}.pt')
-
+        if ((epoch % 10) == 0) :   
+            torch.save(net.state_dict(), f'~/Courses/SMAI_Project/Weights/Model{epoch}.pt')
+    
     print('Finished Training')
     
     
