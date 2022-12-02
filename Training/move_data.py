@@ -4,14 +4,14 @@ import os
 
 json_path = './imagenet_class_index.json'
 src_path = '/ssd_scratch/cvit/shreya/Imagenet2012/Imagenet-orig/train/'
-dest_path = '/ssd_scratch/cvit/shreya/Imagenet2012/Imagenet-smol/train/'
+dest_path = '/ssd_scratch/cvit/shreya/Imagenet2012/Imagenet-10/train/'
 
 f = open(json_path, 'r')
 
 data = json.load(f)
 
 
-    
+indices = {121: 'Crab', 208:'Dog', 284:'cat', 288:'leopard', 294: 'Black Bear', 314: 'Cockroach', 340:'zebra', 346: 'Water Buffalo', 338:'Panda', 386:'Elephant'}    
     
 
 def copytree(src, dst, symlinks=False, ignore=None):
@@ -27,9 +27,17 @@ def copytree(src, dst, symlinks=False, ignore=None):
                 shutil.copy2(s, d)
                 
 
-for val in range(151, 251) :
+#for val in range(151, 251) :
+#    src_name = src_path + data[str(val)][0]
+    
+#    dest_name = dest_path + data[str(val)][0]
+    
+#    copytree(src_name, dest_name)
+
+
+for val in indices:
     src_name = src_path + data[str(val)][0]
-    
+
     dest_name = dest_path + data[str(val)][0]
-    
+
     copytree(src_name, dest_name)
